@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#061323">
+<title>HOCKEY PRO 3D — Édition améliorée</title>
+<style>
+:root{--bg:#061323;--panel:#0c2238;--line:#294b66;--cyan:#4ac8ff;--muted:#a8c0d2;--ice:#e2f7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1b4b6c,#061323 52%,#030912);color:#f4fbff;font-family:system-ui,Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#061323ed;border-bottom:1px solid #24445c;display:flex;justify-content:space-between;align-items:center;padding:13px clamp(12px,4vw,48px);backdrop-filter:blur(10px)}
+.brand{font-weight:1000;letter-spacing:2px}.brand b{color:var(--cyan)}.tag{font-size:11px;color:#bdeaff;border:1px solid #315b78;border-radius:30px;padding:6px 10px}
+main{max-width:1180px;margin:auto;padding:22px 16px 60px}.screen{display:none}.screen.active{display:block}
+.eyebrow{font-size:11px;letter-spacing:3px;font-weight:900;color:var(--cyan)}h1{font-size:clamp(38px,6vw,70px);line-height:.93;letter-spacing:-3px;margin:12px 0}h1 span{color:var(--cyan)}h2{margin:0 0 12px}p{color:#b1c8d9;line-height:1.55}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;min-height:320px}
+.rink-preview{height:240px;border:8px solid #d9f6ff;border-radius:48%;background:linear-gradient(90deg,#b6e5f5,#f0fcff,#b6e5f5);position:relative;box-shadow:0 0 0 4px #1d6088,0 25px 55px #0009;overflow:hidden;transform:perspective(700px) rotateX(12deg)}
+.rink-preview:before{content:"";position:absolute;inset:8%;border:3px solid #df5268;border-radius:50%}.rink-preview:after{content:"";position:absolute;left:50%;height:100%;width:4px;background:#df5268}
+.dot{position:absolute;width:20px;height:20px;border-radius:50%;background:#1267a6;border:3px solid white}.dot.red{background:#d9475d}.d1{left:26%;top:25%}.d2{left:66%;top:58%}.d3{left:42%;top:70%}.d4{left:75%;top:23%}
+button,select,input{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:11px 15px;font-weight:850;transition:.15s}button:hover{filter:brightness(1.12);transform:translateY(-1px)}button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.primary{background:linear-gradient(135deg,#62d5ff,#168ad8);color:#041321}.secondary{background:#12304a;color:#e9f8ff;border:1px solid #315d7b}.danger{background:#55283a;color:#ffe8ed;border:1px solid #8c4058}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:20px 0}.card,.panel{background:linear-gradient(145deg,#102b44,#091a2b);border:1px solid var(--line);border-radius:16px;padding:18px}.card p{font-size:14px}.card .emoji{font-size:28px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;color:#c4d9e8;font-weight:750;font-size:13px;margin-bottom:7px}select,input{width:100%;padding:11px;background:#071a2b;color:#f4fbff;border:1px solid #315675;border-radius:9px}
+.muted{color:#8eaabe;font-size:12px}.hidden{display:none!important}
+.scorebar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;background:#081a2b;border:1px solid #31516b;padding:10px 16px;border-radius:13px;margin-bottom:10px}
+.score{font-size:clamp(25px,4vw,38px);font-weight:1000;font-variant-numeric:tabular-nums}.teamname{font-size:11px;color:#b8d0e1;letter-spacing:1px}.timer{text-align:center;font-size:23px;font-weight:950}.period{text-align:center;font-size:10px;color:#94b1c6}
+.gamewrap{position:relative;background:#071725;border:1px solid #31516b;border-radius:17px;padding:7px;overflow:hidden}canvas{width:100%;display:block;border-radius:11px;background:#c8edf8;touch-action:none}
+.overlay{position:absolute;inset:7px;background:#061323df;display:none;align-items:center;justify-content:center;text-align:center;padding:20px;border-radius:11px}.overlay.show{display:flex}.overlaybox{max-width:440px}.overlay h2{font-size:35px;margin:0 0 8px}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;color:#b6cede;font-size:12px}.key{border:1px solid #3b617d;border-radius:5px;padding:3px 6px;color:#e7f6ff;background:#10283e;font-weight:850}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.stat{background:#0b2034;border:1px solid #244761;border-radius:11px;padding:11px}.stat b{display:block;font-size:20px}.stat span{font-size:10px;color:#9fb9cc}
+.mobile-controls{display:none;grid-template-columns:repeat(3,52px) 1fr 1fr;gap:6px;align-items:center;margin:12px 0}.mobile-controls button{padding:13px 0;background:#173954;color:white;border:1px solid #3a6888}.mobile-controls .act{background:#12689a}
+.table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{padding:9px;border-bottom:1px solid #25445c;text-align:left}.table th{color:#9fc7df}
+@media(max-width:740px){.hero{grid-template-columns:1fr}.rink-preview{height:190px}.cards{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.mobile-controls{display:grid}.stats{grid-template-columns:1fr 1fr}.scorebar{padding:8px}.timer{font-size:19px}}
+</style>
+</head>
+<body>
+<header><div class="brand">🏒 HOCKEY <b>PRO 3D</b></div><div class="tag">ÉDITION AMÉLIORÉE • BÊTA</div></header>
+<main>
+<section id="home" class="screen active">
+ <div class="hero"><div><div class="eyebrow">TON ARÉNA. TON ÉQUIPE. TA LÉGENDE.</div><h1>MAÎTRE DE<br>LA <span>GLACE.</span></h1><p>Un jeu de hockey original : joue contre des bots, développe ton joueur, dispute une saison et collectionne les trophées.</p><div class="actions"><button class="primary" onclick="openSetup('match')">⚡ MATCH IMMÉDIAT</button><button class="secondary" onclick="openSetup('career')">🏆 MODE CARRIÈRE</button></div></div>
+ <div class="rink-preview"><i class="dot d1"></i><i class="dot red d2"></i><i class="dot d3"></i><i class="dot red d4"></i></div></div>
+ <div class="cards">
+  <article class="card"><div class="emoji">🏆</div><h3>Carrière et saison</h3><p>Crée ton joueur, joue des matchs, gagne de l'expérience et suis tes statistiques.</p><button class="secondary" onclick="openSetup('career')">Ma carrière</button></article>
+  <article class="card"><div class="emoji">🤖</div><h3>Équipes complètes</h3><p>5 joueurs de champ et 1 gardien de chaque côté, avec des bots qui attaquent et défendent.</p><button class="secondary" onclick="openSetup('match')">Affronter les bots</button></article>
+  <article class="card"><div class="emoji">📊</div><h3>Mon profil</h3><p>Consulte tes victoires, tes buts, tes tirs et ton expérience accumulée.</p><button class="secondary" onclick="showProfile()">Voir mon profil</button></article>
+ </div>
+ <div class="panel"><div class="eyebrow">FONCTIONNALITÉS</div><h2>6 contre 6 : 5 joueurs + 1 gardien de chaque côté</h2><p>Prototype jouable en vue de dessus, avec gardiens contrôlés par l'ordinateur, changements de joueur, passes, tirs chargés, périodes, score et commandes tactiles. La 3D complète avec modèles animés nécessite un moteur 3D dédié.</p></div>
+</section>
+
+<section id="setup" class="screen"><div class="eyebrow">CONFIGURATION DU MATCH</div><h1 id="setupTitle">PRÉPARE TON <span>MATCH.</span></h1>
+ <div class="panel grid2">
+  <div class="field"><label>Mode</label><select id="mode" onchange="syncSetup()"><option value="match">Match immédiat</option><option value="career">Mode carrière — saison</option></select></div>
+  <div class="field"><label>Nom de ton joueur</label><input id="playerName" maxlength="18" placeholder="Ton nom"></div>
+  <div class="field"><label>Équipe locale NHL</label><select id="team"></select></div>
+  <div class="field"><label>Adversaire BOT NHL</label><select id="opponent"></select></div>
+  <div class="field"><label>Difficulté</label><select id="difficulty"><option value="easy">Débutant</option><option value="normal" selected>Intermédiaire</option><option value="hard">Difficile</option><option value="expert">Expert</option></select></div>
+  <div class="field"><label>Durée d'une période</label><select id="duration"><option value="90">1 min 30 (rapide)</option><option value="120" selected>2 minutes</option><option value="180">3 minutes</option><option value="300">5 minutes</option></select></div>
+  <div class="field careerOnly hidden"><label>Poste</label><select id="position"><option>Centre</option><option>Ailier gauche</option><option>Ailier droit</option><option>Défenseur</option></select></div>
+  <div class="field careerOnly hidden"><label>Style</label><select id="style"><option>Marqueur</option><option>Passeur</option><option>Défensif</option><option>Polyvalent</option></select></div>
+  <div class="actions" style="grid-column:1/-1"><button class="primary" onclick="startGame()">🏒 COMMENCER</button><button class="secondary" onclick="show('home')">Retour</button></div>
+ </div>
+</section>
+
+<section id="game" class="screen">
+ <div class="scorebar"><div><div class="teamname" id="homeName">NORDIQUES</div><div class="score" id="homeScore">0</div></div><div><div class="period" id="period">PÉRIODE 1 / 3</div><div class="timer" id="clock">02:00</div></div><div style="text-align:right"><div class="teamname" id="awayName">LES OURS • BOT</div><div class="score" id="awayScore">0</div></div></div>
+ <div class="gamewrap"><canvas id="rink" width="1000" height="590"></canvas><div class="overlay" id="overlay"><div class="overlaybox"><div class="eyebrow">HOCKEY PRO</div><h2 id="overlayTitle">MI-TEMPS</h2><p id="overlayText">Prêt pour la suite ?</p><div class="actions" style="justify-content:center"><button class="primary" id="overlayMain" onclick="overlayAction()">Continuer</button><button class="secondary" onclick="backHome()">Menu</button></div></div></div></div>
+ <div class="hud"><div>Déplacement <span class="key">WASD</span>/<span class="key">↑↓←→</span> • Tir <span class="key">ESPACE</span> • Passe <span class="key">E</span> • Joueur suivant <span class="key">Q</span> • Mise en échec <span class="key">F</span> • Pause <span class="key">ESC</span></div><div class="actions" style="margin:0"><button class="secondary" onclick="togglePause()">Ⅱ Pause</button><button class="secondary" onclick="restartGame()">↻ Recommencer</button></div></div>
+ <div class="mobile-controls"><button onclick="mobileMove('up')">▲</button><button onclick="mobileMove('up')">▲</button><button onclick="mobileMove('up')">▲</button><button class="act" onclick="shoot()">TIR</button><button class="act" onclick="passPuck()">PASSE</button><button class="act" onclick="checkPlayer()">MISE EN ÉCHEC</button><button onclick="mobileMove('left')">◀</button><button onclick="mobileMove('down')">▼</button><button onclick="mobileMove('right')">▶</button><button class="act" onclick="switchPlayer()">JOUEUR</button><button onclick="togglePause()">PAUSE</button></div>
+ <div class="stats"><div class="stat"><b id="shots">0</b><span>TIRS</span></div><div class="stat"><b id="passes">0</b><span>PASSES</span></div><div class="stat"><b id="saves">0</b><span>ARRÊTS DU GARDIEN</span></div><div class="stat"><b id="xp">0</b><span>XP GAGNÉE</span></div></div>
+ <p class="muted">Conseil : approche-toi d’un adversaire et appuie sur F (ou MISE EN ÉCHEC sur mobile) pour tenter une mise en échec arcade. Si tu réussis, il perd brièvement l’équilibre et peut lâcher la rondelle.</p>
+</section>
+
+<section id="profile" class="screen"><div class="eyebrow">TON PARCOURS</div><h1>MON <span>PROFIL.</span></h1><div class="cards"><div class="card"><div class="muted">Niveau</div><h2 id="level">1</h2></div><div class="card"><div class="muted">Expérience</div><h2 id="totalXp">0 XP</h2></div><div class="card"><div class="muted">Victoires</div><h2 id="wins">0</h2></div></div><div class="panel"><h2>Statistiques générales</h2><table class="table"><tr><th>Statistique</th><th>Total</th></tr><tr><td>Matchs joués</td><td id="gamesPlayed">0</td></tr><tr><td>Buts marqués</td><td id="goalsMade">0</td></tr><tr><td>Tirs tentés</td><td id="shotsMade">0</td></tr><tr><td>Passes</td><td id="passesMade">0</td></tr><tr><td>Défaites</td><td id="losses">0</td></tr></table><div class="actions"><button class="primary" onclick="openSetup('career')">Continuer ma carrière</button><button class="secondary" onclick="show('home')">Retour</button><button class="danger" onclick="resetProfile()">Réinitialiser profil</button></div></div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const NHL_TEAMS=[
+ ['ANA','Anaheim Ducks','Leo Carlsson'],['BOS','Boston Bruins','David Pastrnak'],['BUF','Buffalo Sabres','Tage Thompson'],['CGY','Calgary Flames','Nazem Kadri'],['CAR','Carolina Hurricanes','Sebastian Aho'],['CHI','Chicago Blackhawks','Connor Bedard'],['COL','Colorado Avalanche','Nathan MacKinnon'],['CBJ','Columbus Blue Jackets','Zach Werenski'],['DAL','Dallas Stars','Jason Robertson'],['DET','Detroit Red Wings','Dylan Larkin'],['EDM','Edmonton Oilers','Connor McDavid'],['FLA','Florida Panthers','Aleksander Barkov'],['LAK','Los Angeles Kings','Anze Kopitar'],['MIN','Minnesota Wild','Kirill Kaprizov'],['MTL','Canadiens de Montréal','Nick Suzuki'],['NSH','Nashville Predators','Filip Forsberg'],['NJD','New Jersey Devils','Jack Hughes'],['NYI','New York Islanders','Mathew Barzal'],['NYR','New York Rangers','Artemi Panarin'],['OTT','Ottawa Senators','Brady Tkachuk'],['PHI','Philadelphia Flyers','Travis Konecny'],['PIT','Pittsburgh Penguins','Sidney Crosby'],['SJS','San Jose Sharks','Macklin Celebrini'],['SEA','Seattle Kraken','Matty Beniers'],['STL','St. Louis Blues','Robert Thomas'],['TBL','Tampa Bay Lightning','Nikita Kucherov'],['TOR','Toronto Maple Leafs','Auston Matthews'],['UTA','Utah Mammoth','Clayton Keller'],['VAN','Vancouver Canucks','Elias Pettersson'],['VGK','Vegas Golden Knights','Jack Eichel'],['WSH','Washington Capitals','Alex Ovechkin'],['WPG','Winnipeg Jets','Mark Scheifele']
+];
+function fillNhlTeams(){for(const id of ['team','opponent']){const el=$(id);el.innerHTML='';NHL_TEAMS.forEach(t=>{const o=document.createElement('option');o.value=t[0];o.textContent=t[1];el.appendChild(o);});} $('team').value='MTL';$('opponent').value='TOR';}
+fillNhlTeams();
+const DEFAULT={xp:0,wins:0,losses:0,games:0,goals:0,shots:0,passes:0,season:1,match:1};
+let profile=loadProfile();
+function loadProfile(){try{return Object.assign({xp:0,wins:0,losses:0,games:0,goals:0,shots:0,passes:0,season:1,match:1},JSON.parse(localStorage.getItem('hp3d-profile')||'{}'));}catch(e){return {...DEFAULT};}}
+function saveProfile(){try{localStorage.setItem('hp3d-profile',JSON.stringify(profile));}catch(e){}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+function openSetup(mode){$('mode').value=mode;syncSetup();show('setup');}
+function syncSetup(){let career=$('mode').value==='career';$('setupTitle').innerHTML=career?'DÉMARRE TA <span>SAISON.</span>':'PRÉPARE TON <span>MATCH.</span>';document.querySelectorAll('.careerOnly').forEach(x=>x.classList.toggle('hidden',!career));}
+function showProfile(){let level=Math.floor(profile.xp/100)+1;$('level').textContent=level;$('totalXp').textContent=profile.xp+' XP';$('wins').textContent=profile.wins;$('gamesPlayed').textContent=profile.games;$('goalsMade').textContent=profile.goals;$('shotsMade').textContent=profile.shots;$('passesMade').textContent=profile.passes;$('losses').textContent=profile.losses;show('profile');}
+function resetProfile(){if(confirm('Effacer les statistiques sauvegardées sur cet appareil ?')){profile={...DEFAULT};saveProfile();showProfile();}}
+const canvas=$('rink'),ctx=canvas.getContext('2d'),W=1000,H=590,rx=55,ry=38,rw=890,rh=514;
+let players=[],puck={},score=[0,0],shots=0,passes=0,saves=0,period=1,periodLength=120,timeLeft=120,mode='match',difficulty='normal',home='Nordiques',away='Les Ours',playerName='Joueur',position='Centre',style='Polyvalent',selected=0,running=false,paused=false,ended=false,raf=0,last=0,keys={},charge=0,chargeHeld=false,sessionSaved=false,mobile={},checkCooldown=0,checkFlash=0;
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+function player(team,x,y,role,user=false){return {team,x,y,vx:0,vy:0,role,user,r:user?18:16,angle:team===0?0:Math.PI,cd:0,name:''};}
+function teamInfo(code){return NHL_TEAMS.find(t=>t[0]===code)||NHL_TEAMS[0];}
+function assignPlayerNames(){players.forEach((p,i)=>{const info=teamInfo(p.team===0?home:away);p.name=p.user?playerName:p.role==='goalie'?'Gardien '+info[1]:p.role==='center'?info[2]:({wing:'Ailier',defense:'Défenseur'}[p.role]+' '+(i%2?'gauche':'droit'));});}
+function resetState(){score=[0,0];shots=passes=saves=period=0;period=1;timeLeft=periodLength;charge=0;selected=0;sessionSaved=false;
+ players=[
+ player(0,280,295,'center',true),
+ player(0,235,165,'wing'),
+ player(0,235,425,'wing'),
+ player(0,175,235,'defense'),
+ player(0,175,355,'defense'),
+ player(0,135,295,'goalie'),
+ player(1,720,295,'center'),
+ player(1,765,165,'wing'),
+ player(1,765,425,'wing'),
+ player(1,825,235,'defense'),
+ player(1,825,355,'defense'),
+ player(1,865,295,'goalie')
+ ];
+ assignPlayerNames();puck={x:W/2,y:H/2,vx:0,vy:0,owner:-1};updateHud();draw();}
+function startGame(){mode=$('mode').value;home=$('team').value;away=$('opponent').value;difficulty=$('difficulty').value;playerName=$('playerName').value.trim()||'Joueur';position=$('position').value;style=$('style').value;periodLength=Number($('duration').value);
+ $('homeName').textContent=teamInfo(home)[1].toUpperCase();$('awayName').textContent=(teamInfo(away)[1]+' • BOT').toUpperCase();resetState();show('game');running=true;paused=false;ended=false;last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}
+function updateHud(){$('homeScore').textContent=score[0];$('awayScore').textContent=score[1];$('period').textContent='PÉRIODE '+period+' / 3';$('clock').textContent=String(Math.floor(timeLeft/60)).padStart(2,'0')+':'+String(Math.floor(timeLeft%60)).padStart(2,'0');$('shots').textContent=shots;$('passes').textContent=passes;$('saves').textContent=saves;$('xp').textContent=Math.floor(shots*2+passes+score[0]*20);}
+function showOverlay(title,text,button='Continuer'){ $('overlayTitle').textContent=title;$('overlayText').textContent=text;$('overlayMain').textContent=button;$('overlay').classList.add('show');}
+function togglePause(){if(!running||ended)return;if(paused){paused=false;$('overlay').classList.remove('show');last=performance.now();raf=requestAnimationFrame(loop);}else{paused=true;showOverlay('PAUSE','Le match est en pause.','Reprendre');}}
+function overlayAction(){if(ended){backHome();return;}paused=false;$('overlay').classList.remove('show');last=performance.now();raf=requestAnimationFrame(loop);}
+function backHome(){running=false;cancelAnimationFrame(raf);$('overlay').classList.remove('show');show('home');}
+function saveResult(){if(sessionSaved)return;sessionSaved=true;let won=score[0]>score[1];profile.games++;if(won)profile.wins++;else if(score[0]<score[1])profile.losses++;profile.goals+=score[0];profile.shots+=shots;profile.passes+=passes;profile.xp+=30+score[0]*20+shots*2+passes; if(mode==='career')profile.match++;if(mode==='career'&&profile.match>10){profile.season++;profile.match=1;}saveProfile();}
+function finishMatch(){running=false;ended=true;saveResult();showOverlay(score[0]>score[1]?'VICTOIRE !':score[0]<score[1]?'FIN DU MATCH':'MATCH NUL',`Score final : ${score[0]} — ${score[1]}. Tu gagnes ${30+score[0]*20+shots*2+passes} XP.`, 'Menu principal');}
+function goal(team){score[team]++;puck={x:W/2,y:H/2,vx:0,vy:0,owner:-1};players.forEach((p,i)=>{if(p.role!=='goalie'){p.x=p.team===0?250+(i%3)*24:750-(i%3)*24;p.y=180+(i%3)*110;p.vx=p.vy=0;}});updateHud();}
+function nearestPuck(teamOnly=null){let best=-1,d=1e9;players.forEach((p,i)=>{if(p.role==='goalie'||(teamOnly!==null&&p.team!==teamOnly))return;let n=dist(p,puck);if(n<d){d=n;best=i;}});return best;}
+function acquire(){if(puck.owner>=0)return;let i=nearestPuck();if(i>=0&&dist(players[i],puck)<players[i].r+10)puck.owner=i;}
+function shoot(){if(!running||paused||ended)return;let p=players[selected];if(p.team!==0||p.role==='goalie')return;if(puck.owner!==selected&&dist(p,puck)>40)return;let power=440+Math.min(300,charge*420);puck.owner=-1;puck.x=p.x+Math.cos(p.angle)*25;puck.y=p.y+Math.sin(p.angle)*25;puck.vx=Math.cos(p.angle)*power;puck.vy=Math.sin(p.angle)*power;shots++;charge=0;chargeHeld=false;updateHud();}
+function passPuck(){if(!running||paused||puck.owner!==selected)return;let candidates=players.map((p,i)=>({p,i})).filter(o=>o.p.team===0&&o.i!==selected&&o.p.role!=='goalie').sort((a,b)=>dist(a.p,players[selected])-dist(b.p,players[selected]));if(!candidates.length)return;let mate=candidates[0].p;puck.owner=-1;puck.vx=(mate.x-puck.x)*2.5;puck.vy=(mate.y-puck.y)*2.5;passes++;updateHud();}
+function switchPlayer(){let i=nearestPuck(0);if(i>=0)selected=i;draw();}
+// Contact arcade simplifié : effet bref de recul, sans animation réaliste ni blessure.
+function checkPlayer(){
+ if(!running||paused||ended||checkCooldown>0)return;
+ const tackler=players[selected];if(!tackler||tackler.team!==0||tackler.role==='goalie')return;
+ const target=players.map((p,i)=>({p,i,d:dist(tackler,p)})).filter(o=>o.p.team===1&&o.p.role!=='goalie').sort((a,b)=>a.d-b.d)[0];
+ if(!target||target.d>tackler.r+target.p.r+23){checkFlash=0.8;return;}
+ const dx=target.p.x-tackler.x,dy=target.p.y-tackler.y,n=Math.hypot(dx,dy)||1;
+ target.p.vx+=(dx/n)*245;target.p.vy+=(dy/n)*245;target.p.cd=Math.max(target.p.cd,0.65);
+ if(puck.owner===target.i){puck.owner=-1;puck.x=target.p.x+(dx/n)*24;puck.y=target.p.y+(dy/n)*24;puck.vx=(dx/n)*145;puck.vy=(dy/n)*145;}
+ checkCooldown=1.15;checkFlash=0.55;
+}
+function mobileMove(dir){mobile[dir]=true;setTimeout(()=>mobile[dir]=false,180);}
+window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();keys[k]=true;if(k===' '&&!chargeHeld){chargeHeld=true;charge=0;}if(k==='e'&&!e.repeat)passPuck();if(k==='q'&&!e.repeat)switchPlayer();if(k==='f'&&!e.repeat)checkPlayer();if(k==='escape')togglePause();});
+window.addEventListener('keyup',e=>{let k=e.key.toLowerCase();keys[k]=false;if(k===' '&&chargeHeld){shoot();chargeHeld=false;}});
+function moveToward(p,t,speed,dt){let dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy)||1;p.vx+=(dx/d*speed-p.vx)*Math.min(1,dt*5);p.vy+=(dy/d*speed-p.vy)*Math.min(1,dt*5);if(Math.hypot(p.vx,p.vy)>5)p.angle=Math.atan2(p.vy,p.vx);p.x=clamp(p.x+p.vx*dt,rx+18,rx+rw-18);p.y=clamp(p.y+p.vy*dt,ry+18,ry+rh-18);}
+function update(dt){
+ timeLeft-=dt;checkCooldown=Math.max(0,checkCooldown-dt);checkFlash=Math.max(0,checkFlash-dt);if(timeLeft<=0){timeLeft=0;if(period<3){paused=true;period++;timeLeft=periodLength;showOverlay('FIN DE PÉRIODE',`Période ${period-1} terminée. Score : ${score[0]} — ${score[1]}.`,'Reprendre');updateHud();return;}updateHud();finishMatch();return;}
+ const u=players[selected];let dx=(keys.d||keys.arrowright||mobile.right?1:0)-(keys.a||keys.arrowleft||mobile.left?1:0),dy=(keys.s||keys.arrowdown||mobile.down?1:0)-(keys.w||keys.arrowup||mobile.up?1:0);
+ if(dx||dy){let n=Math.hypot(dx,dy);u.vx=dx/n*260;u.vy=dy/n*260;u.angle=Math.atan2(dy,dx);}else{u.vx*=Math.max(0,1-dt*8);u.vy*=Math.max(0,1-dt*8);}
+ u.x=clamp(u.x+u.vx*dt,rx+18,rx+rw-18);u.y=clamp(u.y+u.vy*dt,ry+18,ry+rh-18);
+ if(chargeHeld)charge=Math.min(1,charge+dt*.75);
+ if(puck.owner===selected){puck.x=u.x+Math.cos(u.angle)*22;puck.y=u.y+Math.sin(u.angle)*22;}
+ // Coéquipiers : soutien et repli.
+ players.forEach((p,i)=>{if(p.team!==0||p.user||p.role==='goalie')return;let t=puck.owner===0?{x:clamp(u.x+90,rx+70,rx+rw-70),y:clamp(u.y+(i%2?100:-100),ry+40,ry+rh-40)}:puck.owner>=4?{x:300,y:p.y< H/2?170:420}:{x:260,y:p.y};moveToward(p,t,175,dt);});
+ // Bots : pression et tir vers la cage du joueur.
+ players.forEach((p,i)=>{if(p.team!==1||p.role==='goalie')return;let t;if(puck.owner===i)t={x:rx+35,y:H/2+(H/2-p.y)*.12};else if(puck.owner>=0&&players[puck.owner].team===0)t={x:puck.x-20,y:puck.y+(i%2?45:-45)};else t={x:puck.x,y:puck.y};let mult={easy:.72,normal:.94,hard:1.12,expert:1.25}[difficulty];moveToward(p,t,165*mult,dt);
+  if(puck.owner===i&&p.cd<=0){p.cd= difficulty==='expert'?.9:1.5;puck.owner=-1;puck.x=p.x-20;puck.y=p.y;puck.vx=-390*(difficulty==='expert'?1.3:1);puck.vy=(H/2-p.y)*.65;}
+  p.cd-=dt;
+ });
+ // Gardiens : suivent latéralement la rondelle, sans quitter leur zone.
+ let g0=players.find(p=>p.team===0&&p.role==='goalie'),g1=players.find(p=>p.team===1&&p.role==='goalie');g0.x=rx+48;g0.y+=(clamp(puck.y,H/2-95,H/2+95)-g0.y)*Math.min(1,dt*4);g1.x=rx+rw-48;g1.y+=(clamp(puck.y,H/2-95,H/2+95)-g1.y)*Math.min(1,dt*4);
+ if(puck.owner<0){puck.x+=puck.vx*dt;puck.y+=puck.vy*dt;puck.vx*=Math.pow(.991,dt*60);puck.vy*=Math.pow(.991,dt*60);acquire();}else if(puck.owner>=4){let p=players[puck.owner];puck.x=p.x-21;puck.y=p.y;if(p.x<rx+rw*.76){puck.owner=-1;puck.vx=-410*(difficulty==='expert'?1.3:1);puck.vy=(H/2-p.y)*.55;}}
+ if(puck.y<ry+9||puck.y>ry+rh-9){puck.y=clamp(puck.y,ry+9,ry+rh-9);puck.vy*=-.78;}
+ let gt=H/2-70,gb=H/2+70;
+ if(puck.x<rx+5){if(puck.y>gt&&puck.y<gb){goal(1);}else{puck.x=rx+5;puck.vx=Math.abs(puck.vx)*.72;}}
+ if(puck.x>rx+rw-5){if(puck.y>gt&&puck.y<gb){if(Math.abs(puck.y-g1.y)<45){puck.x=rx+rw-8;puck.vx=-Math.abs(puck.vx)*.65;puck.vy+=(puck.y-g1.y)*2;saves++;}else goal(0);}else{puck.x=rx+rw-5;puck.vx=-Math.abs(puck.vx)*.72;}}
+ if(puck.x<rx+80&&puck.x>rx+15&&Math.abs(puck.y-g0.y)<35&&puck.vx<0){puck.vx=Math.abs(puck.vx)*.8;saves++;}
+ players.forEach((p,i)=>{if(p.role!=='goalie'&&puck.owner<0&&dist(p,puck)<p.r+8)puck.owner=i;});
+ updateHud();
+}
+function draw(){
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#17415c';rr(ctx,18,15,964,560,42);ctx.fill();ctx.fillStyle='#e6f8ff';rr(ctx,rx,ry,rw,rh,62);ctx.fill();
+ let gr=ctx.createLinearGradient(0,ry,0,ry+rh);gr.addColorStop(0,'#c4eaf7');gr.addColorStop(.5,'#f2fcff');gr.addColorStop(1,'#bce6f4');ctx.fillStyle=gr;rr(ctx,rx,ry,rw,rh,62);ctx.fill();
+ ctx.save();ctx.beginPath();rr(ctx,rx,ry,rw,rh,62);ctx.clip();ctx.strokeStyle='#df5268';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(W/2,ry);ctx.lineTo(W/2,ry+rh);ctx.stroke();ctx.strokeStyle='#348bc0';[rx+rw*.28,rx+rw*.72].forEach(x=>{ctx.beginPath();ctx.moveTo(x,ry);ctx.lineTo(x,ry+rh);ctx.stroke();});ctx.strokeStyle='#d84c62';ctx.lineWidth=4;ctx.beginPath();ctx.arc(W/2,H/2,75,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#d84c62';[[W/2,H/2],[rx+rw*.23,H/2-130],[rx+rw*.23,H/2+130],[rx+rw*.77,H/2-130],[rx+rw*.77,H/2+130]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();});ctx.restore();
+ // Nets and goalie creases
+ ctx.fillStyle='#d94c62';ctx.fillRect(rx-8,H/2-72,15,144);ctx.fillRect(rx+rw-7,H/2-72,15,144);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeRect(rx-7,H/2-70,13,140);ctx.strokeRect(rx+rw-6,H/2-70,13,140);
+ players.forEach((p,i)=>{ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);ctx.fillStyle='#17344a';ctx.beginPath();ctx.ellipse(2,9,p.r,9,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=p.role==='goalie'?'#f0b44a':p.team===0?'#1267a6':'#d9475d';ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle=i===selected?'#fff36b':'#f1fbff';ctx.lineWidth=i===selected?5:3;ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(4,-4,5,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#172b3b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(8,8);ctx.lineTo(28,18);ctx.stroke();ctx.restore();});
+ // Le nom du porteur de rondelle apparaît juste sous son joueur.
+ if(puck.owner>=0){const carrier=players[puck.owner];if(carrier){ctx.save();ctx.font='bold 15px system-ui,Arial';ctx.textAlign='center';ctx.textBaseline='top';const label=carrier.name||'Joueur';const width=ctx.measureText(label).width+14;const lx=clamp(carrier.x,rx+width/2,rx+rw-width/2);const ly=clamp(carrier.y+carrier.r+8,ry+5,ry+rh-25);ctx.fillStyle='#061323e8';ctx.beginPath();ctx.roundRect(lx-width/2,ly,width,22,7);ctx.fill();ctx.fillStyle='#ffffff';ctx.fillText(label,lx,ly+3);ctx.restore();}}
+ ctx.fillStyle='#17212b';ctx.beginPath();ctx.ellipse(puck.x,puck.y+3,11,7,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#050b12';ctx.beginPath();ctx.ellipse(puck.x,puck.y,11,7,0,0,Math.PI*2);ctx.fill();
+ let u=players[selected];if(u){ctx.strokeStyle='#ffe66b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(u.x,u.y,27,0,Math.PI*2);ctx.stroke();}
+ if(checkFlash>0){ctx.save();ctx.fillStyle='#061323';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText(checkCooldown>0?'MISE EN ÉCHEC !':'Trop loin !',W/2,ry+28);ctx.restore();}
+ if(chargeHeld){ctx.fillStyle='#102c43';ctx.fillRect(420,548,160,12);ctx.fillStyle='#ffcf52';ctx.fillRect(420,548,160*charge,12);ctx.strokeStyle='#fff';ctx.strokeRect(420,548,160,12);}
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r);}
+function loop(now){if(!running||paused||ended)return;let dt=Math.min(.04,(now-last)/1000||0);last=now;update(dt);draw();if(running&&!paused&&!ended)raf=requestAnimationFrame(loop);}
+function restartGame(){running=false;cancelAnimationFrame(raf);startGame();}
+draw();
+</script>
+</body></html>
